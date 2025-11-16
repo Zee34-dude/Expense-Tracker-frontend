@@ -1,15 +1,20 @@
-'use client';
 
-import { useState } from 'react';
+
+import { useEffect, useState, } from 'react';
 import TransactionTable from '../components/TransactionTable';
 import SearchIcon from '../assets/Vector (5).png'
 import { ChevronDownIcon, PlusIcon } from 'lucide-react';
 import CreateTransactions from '../components/Create_transaction';
-
+import { fetchTransactions } from '../apis/Transaction.api';
+import { deleteTransaction } from '../apis/Transaction.api';
+import { useNavigate } from 'react-router-dom';
 const AllTransactions = () => {
-    const [transactions, setTransactions] = useState();
 
-    const handleDelete = (id) => {
+    const [transactions, setTransactions] = useState([]);
+    const navigate=useNavigate()
+
+    const handleDelete = async (id) => {
+        const deleteId = await deleteTransaction(id)
         setTransactions(transactions.filter((t) => t.id !== id));
     };
 
@@ -18,10 +23,32 @@ const AllTransactions = () => {
         // Add edit functionality here
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetchTransactions();
+
+                setTransactions(res);
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        fetchData();
+    }, []);
+    // useEffect(()=>{
+    //     console.log(transactions)
+    // },[])
+
+    // if (transactions.length < 1) {
+    //     setAuthInitialized(false)
+    // }
+
+
     return (
-        <main className={`${transactions?.length>0?'h-screen':'overflow'} bg-background p-6`}>
+        <main className={`${transactions?.length > 0 ? 'h-screen' : 'overflow'} bg-background p-6`}>
             <div className="max-w-7xl mx-auto">
-                <div className='flex items-center w-full gap-40'>
+                <div className='flex items-center w-full gap-40 mb-8'>
                     <h1 className='text-3xl '>Transactions</h1>
                     <div className='flex  gap-10'>
                         <div className='flex items-center gap-2'>
@@ -30,10 +57,10 @@ const AllTransactions = () => {
                             </i>
                             <p className='text-[#555454] font-medium'>Search transactions</p>
                         </div>
-                        <div className='font-medium flex gap-2 '>Date <ChevronDownIcon /> </div>
-                        <div className='font-medium flex gap-2' > Category <ChevronDownIcon />  </div>
+                        <div className='font-medium flex  items-center '>Date <ChevronDownIcon size={20}  /> </div>
+                        <div className='font-medium flex  items-center' > Category <ChevronDownIcon size={20}  />  </div>
                     </div>
-                    <button className='bg-[#0A3594] flex p-2 font-medium text-white gap-2 rounded-sm '>
+                    <button onClick={()=>navigate('/transactions/add')} className='bg-[#0A3594] flex p-2 font-medium text-white gap-2 rounded-sm '>
                         <PlusIcon size={20} className='text-white text-2xl font-bold' /> Transactions
                     </button>
                 </div>

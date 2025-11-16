@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Trash2, Edit } from 'lucide-react';
+import { formatDate } from '../utils/DateFunction';
 
 export default function TransactionTable({
   transactions,
@@ -41,8 +42,8 @@ export default function TransactionTable({
     }
   };
 
-  const formatAmount = (amount) => {
-    return `${amount < 0 ? '-' : '+'}₦${Math.abs(amount).toLocaleString()}`;
+  const formatAmount = (type,amount) => {
+    return `${type == 'EXPENSE' ? '-' : '+'}₦${Math.abs(amount).toLocaleString()}`;
   };
 
   return (
@@ -82,37 +83,36 @@ export default function TransactionTable({
           </tr>
         </thead>
         <tbody>
-          {sortedTransactions.map((transaction, index) => (
-            <tr
+          {sortedTransactions.map((transaction, index) => {
+          
+            return (<tr
               key={transaction.id}
-              className={` transition-colors hover:bg-[#dbe2e9] ${
-                index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
-              }`}
+              className={` transition-colors hover:bg-[#dbe2e9] ${index % 2 === 1 ? 'bg-[#F9FAFB]' : ''
+                }`}
             >
               <td className="px-6 py-4 text-sm text-foreground">
-                {transaction.date}
+                {formatDate(transaction.date)}
               </td>
-              <td className="px-6 py-4 text-sm text-foreground">
+              <td className="px-6 py-4 text-sm text-foreground text-left">
                 {transaction.description}
               </td>
-              <td className="px-6 py-4 text-sm text-foreground">
+              <td className="px-6 py-4 text-sm text-foreground text-left">
                 <span className="inline-block  rounded-md  ">
-                  {transaction.category}
+                  {transaction.category?.name}
                 </span>
               </td>
-              <td className="px-6 py-4 text-sm text-foreground">
-                {transaction.account}
+              <td className="px-6 py-4 text-sm text-foreground text-left">
+                {transaction.account?.name}
               </td>
               <td
-                className={`px-6 py-4 text-sm font-semibold ${
-                  transaction.amount > 0
+                className={`px-6 py-4 text-sm font-semibold text-left ${transaction.type == 'INCOME'
                     ? 'text-green-600'
                     : 'text-red-600'
-                }`}
+                  }`}
               >
-                {formatAmount(transaction.amount)}
+                {formatAmount(transaction.type,transaction.amount)}
               </td>
-              <td className="px-6 py-4 text-sm">
+              <td className="px-6 py-4 text-sm text-left">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onDelete(transaction.id)}
@@ -130,8 +130,8 @@ export default function TransactionTable({
                   </button>
                 </div>
               </td>
-            </tr>
-          ))}
+            </tr>)
+          })}
         </tbody>
       </table>
     </div>

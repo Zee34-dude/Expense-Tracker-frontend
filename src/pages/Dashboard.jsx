@@ -1,10 +1,10 @@
 import { auth } from "../config/firebase";
-import { useEffect } from "react";
+import { fetchTransactionSummary, fetchMonthlySummary, fetchTransactions } from "../apis/Transaction.api";
+import { useEffect, useState, useContext } from "react";
 import { UserContext } from "../context/UserContext";
-import { useContext } from "react";
-import { signOut } from "firebase/auth";
-import Sidebar from "../components/Sidebar";
-import HeaderBar from "../components/HeaderBar";
+
+
+
 import StatsCards from "../components/StatsCards";
 import InsightsChart from "../components/InsightsChart";
 import BudgetCard from "../components/BudgetCard";
@@ -24,24 +24,72 @@ const data = [
 ];
 
 function Dashboard() {
-  const {user}=useContext(UserContext)
-  useEffect(() => {
-    console.log(user)
+  const { user } = useContext(UserContext)
+  const [loadingDashboard, setLoadingDashboard] = useState(false);
+  const [chartData, setChartData] = useState([]);
+  const [transactions,setTransactions]=useState([])
+  const [type, setType] = useState({
+    totalIncome: 0,
+    totalExpense: 0,
+    balance: 0
   })
+  useEffect(() => {
+    const getTransactionAmount = () => {
+      fetchTransactions()
+        .then((res) => setTransactions(res))
+        .catch((err) => console.log(err))
+      fetchTransactionSummary()
+        .then((res) => setType({
+          totalIncome: res.totalIncome,
+          totalExpense: res.totalExpense,
+          balance: res.balance
+        }))
+    }
+
+    const getMonthlySummary = () => {
+      fetchMonthlySummary()
+        .then((res) => setChartData(res))
+        .catch((err) => console.log(err))
+    }
+    getTransactionAmount()
+    getMonthlySummary()
+  }, [])
+
+  const refreshDashboard = async () => {
+    setLoadingDashboard(true); // show loading
+    try {
+      const res = await fetchTransactionSummary(); // or your API call
+      setType({
+        totalIncome: res.totalIncome,
+        totalExpense: res.totalExpense,
+        balance: res.balance
+      });
+    } catch (err) {
+      console.error("Failed to fetch transactions", err);
+    } finally {
+      setLoadingDashboard(false); // hide loading
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-
+      {loadingDashboard && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-50">
+          <p className="text-xl font-semibold text-white">Updating...</p>
+        </div>
+      )}
       {/* Main Content */}
       <div className="flex-1">
+
 
         {/* Dashboard Content */}
         <div className="p-4 md:p-6">
 
-          <StatsCards />
+          <StatsCards type={type} />
 
           {/* Middle Row - Insights and Budget/Bills */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
-            <InsightsChart data={data} />
+            <InsightsChart data={chartData || data} />
             <div className="space-y-4 md:space-y-6">
               <BudgetCard />
               <BillsCard />
@@ -50,8 +98,8 @@ function Dashboard() {
 
           {/* Bottom Row - Recent Transactions and Action Buttons */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            <RecentTransactions />
-            <ActionButtons />
+            <RecentTransactions transactions={transactions} />
+            <ActionButtons refreshDashboard={refreshDashboard} />
           </div>
 
         </div>

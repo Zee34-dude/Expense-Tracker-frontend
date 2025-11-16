@@ -2,56 +2,69 @@
 
 import { useState, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
+import { getCategories } from '../../apis/Category.api';
 
 export default function BudgetModal({
   isOpen,
   onClose,
   onSubmit,
   initialData,
-  categories,
 }) {
   const [formData, setFormData] = useState({
-    category: '',
-    budgetAmount: '',
-    spentAmount: '',
+    categoryId: '',
+    amount: '',
     startDate: '',
     endDate: '',
   });
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const data = await getCategories();
+        console.log(data)
+        setCategories(data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    }
+    fetchCategories();
+
+  }, []);
 
   useEffect(() => {
     if (initialData) {
       setFormData({
-        category: initialData.category,
-        budgetAmount: initialData.budgetAmount.toString(),
-        spentAmount: initialData.spentAmount.toString(),
+        categoryId: initialData.categoryId,
+        amount: initialData.amount.toString(),
         startDate: initialData.startDate || '',
         endDate: initialData.endDate || '',
       });
     } else {
       setFormData({
-        category: '',
-        budgetAmount: '',
-        spentAmount: '',
+        categoryId: '',
+        amount: '',
         startDate: '',
         endDate: '',
+        categoryName: ''
       });
     }
   }, [initialData, isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (!formData.category || !formData.budgetAmount || !formData.spentAmount) {
+    console.log(formData)
+    if (!formData.categoryId || !formData.amount || !formData.startDate || !formData.endDate) {
       alert('Please fill in all required fields');
       return;
     }
 
     onSubmit({
-      category: formData.category,
-      budgetAmount: parseFloat(formData.budgetAmount),
-      spentAmount: parseFloat(formData.spentAmount),
-      startDate: formData.startDate,
-      endDate: formData.endDate,
+      categoryId: formData.categoryId,
+      amount: parseFloat(formData.amount),
+      startDate: new Date(formData.startDate).toISOString(),
+      endDate: new Date(formData.endDate).toISOString(),
+      categoryName: formData.categoryName
     });
   };
 
@@ -59,14 +72,14 @@ export default function BudgetModal({
 
   return (
     <>
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 z-40"
         onClick={onClose}
         role="presentation"
       />
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div 
+        <div
           className="bg-white rounded-lg shadow-lg w-full max-w-md"
           onClick={(e) => e.stopPropagation()}
         >
@@ -99,47 +112,39 @@ export default function BudgetModal({
               </label>
               <select
                 id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                value={formData.categoryId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedCategory = categories.find(cat => cat.id.toString() === selectedId);
+                  setFormData({
+                    ...formData,
+                    categoryId: selectedId,
+                    categoryName: selectedCategory ? selectedCategory.name : ''
+                  });
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name} ({cat.type})
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="budgetAmount" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
                 Budget Amount ($) <span className="text-red-500">*</span>
               </label>
               <input
-                id="budgetAmount"
+                id="amount"
                 type="number"
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                value={formData.budgetAmount}
-                onChange={(e) => setFormData({ ...formData, budgetAmount: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="spentAmount" className="block text-sm font-medium text-gray-700">
-                Amount Spent ($) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="spentAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={formData.spentAmount}
-                onChange={(e) => setFormData({ ...formData, spentAmount: e.target.value })}
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               />
             </div>

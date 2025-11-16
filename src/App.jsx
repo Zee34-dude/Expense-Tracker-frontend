@@ -4,6 +4,7 @@ import Routes from "./routes.jsx";
 import UserProvider from "./context/UserContext.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import { UserContext } from "./context/UserContext.jsx";
+;
 
 
 function App() {

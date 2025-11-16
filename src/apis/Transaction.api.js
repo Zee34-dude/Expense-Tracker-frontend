@@ -24,7 +24,8 @@ const getAuthHeader = async () => {
 export const fetchTransactions = async () => {
   try {
     const headers = await getAuthHeader();
-    const res = await axios.get(API_URL, {headers});
+    const res = await axios.get(API_URL, headers);
+    console.log('api', res.data)
     return res.data;
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -91,3 +92,13 @@ export const fetchTransactionSummary = async () => {
     throw error;
   }
 };
+export const fetchMonthlySummary= async()=> {
+  try {
+    const headers = await getAuthHeader();
+    const res = await axios.get(`${API_URL}/monthly-summary`, headers);
+    console.log(res.data)
+    return res.data
+  } catch (err) {
+    console.error("Fetch monthly summary failed:", err);
+  }
+}

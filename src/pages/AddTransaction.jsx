@@ -2,13 +2,15 @@ import React from 'react'
 import { addTransaction } from '../apis/Transaction.api'
 import { getCategories } from '../apis/Category.api';
 import { useState, useEffect } from "react";
-
+import { fetchAccounts } from '../apis/Account.api';
 
 
 
 
 const AddTransaction = () => {
   const [categories, setCategories] = useState([]);
+  const [account, setAccount] = useState([])
+
 
   useEffect(() => {
     async function fetchCategories() {
@@ -21,6 +23,11 @@ const AddTransaction = () => {
       }
     }
     fetchCategories();
+
+    fetchAccounts()
+      .then(data => setAccount(data))
+      .catch(err => console.error(err))
+
   }, []);
   // console.log(categories)
   const handleSubmit = async (e) => {
@@ -28,26 +35,34 @@ const AddTransaction = () => {
 
     const form = new FormData(e.target);
     console.log(form)
+    const categoryId = Number(form.get("category"))
+    const selectedCategory = categories.find(cat => cat.id == categoryId);
+
 
     const data = {
-      type: form.get("type"),
+      type: selectedCategory.type,
       amount: Number(form.get("amount")),
-      categoryId: Number(form.get("category")),
-      accountId: 2,
+      categoryId,
+      accountId: Number(form.get('account')),
       date: form.get("date"),
       description: form.get("description"),
     };
 
     console.log("Transaction Data:", data.categoryId);
-    console.log('data:',data)
+    console.log('data:', data)
 
     try {
       const response = await addTransaction(data);
       console.log("Saved:", response);
-      alert("Transaction saved!");
+      // alert("Transaction saved!");
+
     } catch (err) {
       console.error(err);
       alert("Failed to save transaction");
+    }
+    finally {
+      window.location.href = "/transactions";
+
     }
   };
 
@@ -114,9 +129,11 @@ const AddTransaction = () => {
                 </label>
                 <select name='account' className="w-full border border-gray-300 rounded-md p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                   <option>Enter</option>
-                  <option>Main Wallet</option>
-                  <option>Bank</option>
-                  <option>Cash</option>
+                  {account?.map((acc) => (
+                    <option key={acc.id} value={acc.id}>
+                      {acc.type}
+                    </option>
+                  ))}
                 </select>
               </div>
 
