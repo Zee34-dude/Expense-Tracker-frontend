@@ -1,21 +1,36 @@
-export default function BudgetChart({ budgets }) {
-  const chartData = budgets.map((budget, index) => ({
-    name: budget.category,
-    value: budget.spentAmount,
-    color: [
-      '#3b82f6', // blue
-      '#ef4444', // red
-      '#10b981', // green
-      '#f59e0b', // amber
-      '#8b5cf6', // purple
-    ][index % 5],
-  }));
+export default function BudgetChart({ budgets, calculateSpent }) {
+  // Map all budgets for legend
+  const chartData = budgets.map((budget, index) => {
+    const spentAmount = Number(calculateSpent(budget)) || 0;
 
-  const totalSpent = chartData.reduce((sum, item) => sum + item.value, 0);
+    return {
+      name: budget.name,
+      value: spentAmount,
+      // Assign gray to zeros, otherwise a color from palette
+      color: spentAmount > 0
+        ? ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'][index % 5]
+        : '#9ca3af', // gray for zero-spent items
+    };
+  });
 
-  // Calculate pie chart segments
+  // Only use non-zero budgets for the pie chart
+  const segments = chartData.filter(item => item.value > 0);
+
+  const totalSpent = segments.reduce((sum, item) => sum + item.value, 0);
+
+  if (chartData.length === 0) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-6 h-full flex flex-col">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Spending by Category</h2>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-500 text-center">No budget data to display</p>
+        </div>
+      </div>
+    );
+  }
+
   let currentAngle = -90;
-  const segments = chartData.map((item) => {
+  const chartSegments = segments.map(item => {
     const sliceAngle = (item.value / totalSpent) * 360;
     const startAngle = currentAngle;
     const endAngle = currentAngle + sliceAngle;
@@ -46,23 +61,13 @@ export default function BudgetChart({ budgets }) {
     return { ...item, pathData, labelX, labelY, percentage: ((item.value / totalSpent) * 100).toFixed(1) };
   });
 
-  if (chartData.length === 0) {
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6 h-full flex flex-col">
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">Spending by Category</h2>
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-gray-500 text-center">No budget data to display</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 h-full flex flex-col">
+    <div className="bg-white border border-gray-200 rounded-lg p-6 flex flex-col">
       <h2 className="text-2xl font-bold mb-6 text-gray-900">Spending by Category</h2>
+
       <div className="flex-1 flex flex-col items-center justify-center">
         <svg width="300" height="300" viewBox="0 0 200 200" className="mb-6">
-          {segments.map((segment, index) => (
+          {chartSegments.map((segment, index) => (
             <g key={index}>
               <path
                 d={segment.pathData}
@@ -75,7 +80,9 @@ export default function BudgetChart({ budgets }) {
                 y={segment.labelY}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="text-xs font-semibold fill-white"
+                fill="white"
+                fontSize="10"
+                fontWeight="600"
               >
                 {segment.percentage}%
               </text>
@@ -83,8 +90,9 @@ export default function BudgetChart({ budgets }) {
           ))}
         </svg>
 
+        {/* Legend / Segment List */}
         <div className="w-full space-y-2">
-          {segments.map((segment, index) => (
+          {chartData.map((segment, index) => (
             <div key={index} className="flex items-center gap-3">
               <div
                 className="w-3 h-3 rounded-full flex-shrink-0"

@@ -23,11 +23,11 @@ function RecentTransactions({ transactions }) {
           <div key={index} className="bg-gray-50 p-4 rounded-lg">
             <div className="flex items-center gap-3 mb-2">
               <div className="flex-1">
-                <p className="font-medium text-gray-800">{item.account.name}</p>
+                <p className="font-medium text-gray-800">{item.amount}</p>
                 <p className="text-sm text-gray-600">{item.category?.name}</p>
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-800">{item.amount}</p>
+                <p className="font-medium text-gray-800">{item.date}</p>
                 <p className="text-sm text-gray-600">{item.date}</p>
               </div>
             </div>
@@ -48,10 +48,10 @@ function RecentTransactions({ transactions }) {
         <tbody>
           {limitedData.map((item, index) => (
             <tr key={index} className="border-b border-gray-100">
-              <td className="py-3 text-gray-600 text-left">{formatDate(item.date)}</td>
+              <td className="py-3 text-gray-600 text-left">{item.account.type}</td>
               <td className="py-3 text-gray-600 text-left">{item.category?.name}</td>
-              <td className="py-3 font-medium text-gray-800 flex ">{item.account?.name}</td>
-              <td className="py-3 font-medium text-gray-800 text-left">{item.amount}</td>
+              <td className="py-3 font-medium text-gray-800 flex ">{item.amount}</td>
+              <td className="py-3 font-medium text-gray-800 text-left">{formatDate(item.date)}</td>
             </tr>
           ))}
         </tbody>

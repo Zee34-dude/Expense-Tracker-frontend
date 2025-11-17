@@ -102,7 +102,7 @@ export default function TransactionTable({
                 </span>
               </td>
               <td className="px-6 py-4 text-sm text-foreground text-left">
-                {transaction.account?.name}
+                {transaction.account?.type}
               </td>
               <td
                 className={`px-6 py-4 text-sm font-semibold text-left ${transaction.type == 'INCOME'

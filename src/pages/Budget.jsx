@@ -99,7 +99,7 @@ export default function BudgetPage() {
     setBudgets([
       ...budgets,
       { ...res.budget, spent: spentRes.spent }
-    ]); 
+    ]);
     setIsModalOpen(false);
   };
 
@@ -107,7 +107,7 @@ export default function BudgetPage() {
   const handleEditBudget = async (id, updatedBudget) => {
     const res = await updateBudget(id, updatedBudget);
     setBudgets(
-      budgets.map((b) => (b.id === id ? { ...res, spent: b.spent } : b))
+      budgets.map((b) => (b.id === id ? { ...res.budget, spent: b.spent } : b))
     );
     setEditingId(null);
     setIsModalOpen(false);
@@ -118,7 +118,24 @@ export default function BudgetPage() {
     await deleteBudget(id);
     setBudgets(budgets.filter((b) => b.id !== id));
   };
+// Calculate actual spent amount based on real transactions
 
+  const calculateSpent = (budget) => {
+    const filtered = transactions.filter((t) => {
+      const sameCategory = t.categoryId === budget.categoryId;
+
+
+      const dateMatches =
+        new Date(t.date) >= new Date(budget.startDate) &&
+        new Date(t.date) <= new Date(budget.endDate);
+
+      const isExpense = t.type === "EXPENSE"; // <-- cleaner & accurate
+
+      return sameCategory && dateMatches && isExpense;
+    });
+
+    return filtered.reduce((sum, t) => sum + t.amount, 0);
+  };
   const totalBudget = budgets.reduce((sum, b) => sum + b.limit, 0);
   const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
   const totalRemaining = totalBudget - totalSpent;
@@ -143,7 +160,7 @@ export default function BudgetPage() {
           <div className="lg:col-span-2">
             <BudgetList
               budgets={budgets}
-              transactions={ transactions}
+              calculateSpent={calculateSpent}
               onEdit={(id) => {
                 setEditingId(id);
                 setIsModalOpen(true);
@@ -153,7 +170,9 @@ export default function BudgetPage() {
           </div>
 
           <div>
-            <BudgetChart budgets={budgets1} />
+            <BudgetChart budgets={budgets}
+              calculateSpent={calculateSpent} 
+              />
           </div>
         </div>
 

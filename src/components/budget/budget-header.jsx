@@ -23,9 +23,9 @@ export default function BudgetHeader({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <StatCard title='Total Budget' amount={totalBudget.toFixed(2)} trendColor="text-green-500" />
-                <StatCard title='Total Spent' amount={totalSpent.toFixed(2)} />
-                <StatCard title='Remaining' amount={totalRemaining.toFixed(2)} trendColor="text-red-500" />
+                <StatCard title='Total Budget' amount={totalBudget.toFixed(2)} trendColor="text-green-500" trendValue={''} />
+                <StatCard title='Total Spent' amount={totalSpent.toFixed(2)} trendValue={''} />
+                <StatCard title='Remaining' amount={totalRemaining.toFixed(2)} trendColor="text-red-500" trendValue={''} />
             </div>
         </div>
     );
