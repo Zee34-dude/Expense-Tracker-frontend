@@ -13,6 +13,8 @@ import TransactionSuccess from './pages/TransactionSuccess.jsx';
 import AddTransactionFailed from './pages/TransactionFailed.jsx';
 import AllTransactions from './pages/AllTransactions.jsx';
 import BudgetPage from './pages/Budget.jsx';
+import ReportPage from './pages/ReportPage.jsx';
+import HelpPage from './pages/HelpPage.jsx';
 
 const AppRouter = () => {
     const { user, authInitialized } = useContext(UserContext);
@@ -37,6 +39,8 @@ const AppRouter = () => {
         { path: '/transactions/success', element: <TransactionSuccess />, protected: true },
         { path: '/transactions/failed', element: <AddTransactionFailed />, protected: true },
         { path: '/budget', element: <BudgetPage />, protected: true },
+        { path: '/reports', element: <ReportPage />, protected: true },
+        { path: '/help', element: <HelpPage />, protected: true },
     ];
 
     return (

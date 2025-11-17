@@ -19,7 +19,6 @@ function Sidebar({ firstName }) {
     { path: "/", label: "Dashboard", icon: <FaHome /> },
     { path: "/transactions", label: "Transactions", icon: <FaExchangeAlt /> },
     { path: "/budget", label: "Budget", icon: <FaWallet /> },
-    { path: "/settings", label: "Settings", icon: <FaCog /> },
     { path: "/reports", label: "Reports", icon: <FaChartPie /> },
   ];
 

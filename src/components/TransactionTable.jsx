@@ -98,7 +98,7 @@ export default function TransactionTable({
               </td>
               <td className="px-6 py-4 text-sm text-foreground text-left">
                 <span className="inline-block  rounded-md  ">
-                  {transaction.category?.name}
+                  {transaction.category}
                 </span>
               </td>
               <td className="px-6 py-4 text-sm text-foreground text-left">

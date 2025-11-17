@@ -1,212 +1,205 @@
-
-
-import { useEffect, useState, } from 'react';
+import { useEffect, useState } from 'react';
 import TransactionTable from '../components/TransactionTable';
-import SearchIcon from '../assets/Vector (5).png'
+import SearchIcon from '../assets/Vector (5).png';
 import { ChevronDownIcon, PlusIcon } from 'lucide-react';
 import CreateTransactions from '../components/Create_transaction';
-import { fetchTransactions } from '../apis/Transaction.api';
-import { deleteTransaction } from '../apis/Transaction.api';
+import { fetchTransactions, deleteTransaction } from '../apis/Transaction.api';
+import { getCategories } from '../apis/Category.api';
 import { useNavigate } from 'react-router-dom';
-const AllTransactions = () => {
 
+const AllTransactions = () => {
     const [transactions, setTransactions] = useState([]);
-    const navigate=useNavigate()
+    const [categories, setCategories] = useState([]);
+    const [categoryFilter, setCategoryFilter] = useState("All");
+    const [dateFilter, setDateFilter] = useState("Newest");
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+
+    const [showDateDropdown, setShowDateDropdown] = useState(false);
 
     const handleDelete = async (id) => {
-        const deleteId = await deleteTransaction(id)
+        await deleteTransaction(id);
         setTransactions(transactions.filter((t) => t.id !== id));
     };
 
-    const handleEdit = (id) => {
-        console.log('Edit transaction:', id);
-        // Add edit functionality here
-    };
-
+    // Load transactions + categories
     useEffect(() => {
-        const fetchData = async () => {
+        const loadData = async () => {
             try {
-                const res = await fetchTransactions();
+                const tx = await fetchTransactions();
+                const cat = await getCategories();
 
-                setTransactions(res);
+                // Normalize categories for dropdown
+                const categoryNames = ["All", ...cat.map(c => c.name)];
+                setCategories(categoryNames);
+
+                // Normalize transactions so t.category is always a string
+                const normalizedTx = tx.map(t => ({
+                    ...t,
+                    category: typeof t.category === "object"
+                        ? t.category.name
+                        : t.category
+                }));
+
+                setTransactions(normalizedTx);
             } catch (err) {
                 console.log(err);
             }
-        }
+        };
 
-        fetchData();
+        loadData();
     }, []);
-    // useEffect(()=>{
-    //     console.log(transactions)
-    // },[])
 
-    // if (transactions.length < 1) {
-    //     setAuthInitialized(false)
-    // }
+    // Apply filters
+    const filteredTransactions = transactions
+        // Category filter
+        .filter(t =>
+            categoryFilter === "All" ? true : t.category === categoryFilter
+        )
+        // Search filter (by description OR category)
+        .filter(t => {
+            if (searchQuery.trim() === "") return true;
+            const q = searchQuery.toLowerCase();
+            return (
+                t.description.toLowerCase().includes(q) ||
+                t.category.toLowerCase().includes(q)
+            );
+        })
+        // Sort
+        .sort((a, b) =>
+            dateFilter === "Newest"
+                ? new Date(b.date) - new Date(a.date)
+                : new Date(a.date) - new Date(b.date)
+        );
 
+    // Resets all filters
+    const resetFilters = () => {
+        setCategoryFilter("All");
+        setSearchQuery("");
+        setDateFilter("Newest");
+    };
 
+    const noResults = filteredTransactions.length === 0;
+    const showResetBelow = categoryFilter !== "All" || searchQuery.trim() !== "";
+    console.log(transactions)
     return (
         <main className={`${transactions?.length > 0 ? 'h-screen' : 'overflow'} bg-background p-6`}>
             <div className="max-w-7xl mx-auto">
-                <div className='flex items-center w-full gap-40 mb-8'>
-                    <h1 className='text-3xl '>Transactions</h1>
-                    <div className='flex  gap-10'>
-                        <div className='flex items-center gap-2'>
-                            <i className=' w-4 h-4'>
+                <div className="flex items-center w-full gap-40 mb-8">
+
+                    {/* Title */}
+                    <h1 className="text-3xl">Transactions</h1>
+
+                    {/* Filters */}
+                    <div className="flex gap-10">
+
+                        {/* Search */}
+                        <div className="flex items-center gap-2">
+                            <i className="w-4 h-4">
                                 <img src={SearchIcon} alt="" />
                             </i>
-                            <p className='text-[#555454] font-medium'>Search transactions</p>
+                            <input
+                                type="text"
+                                placeholder="Search transactions"
+                                className="text-[#555454] font-medium outline-none bg-transparent"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-                        <div className='font-medium flex  items-center '>Date <ChevronDownIcon size={20}  /> </div>
-                        <div className='font-medium flex  items-center' > Category <ChevronDownIcon size={20}  />  </div>
+
+                        {/* Date Filter */}
+                        <div
+                            className="font-medium flex items-center gap-1 relative cursor-pointer"
+                            onClick={() => setShowDateDropdown(!showDateDropdown)}
+                        >
+                            <span>{dateFilter}</span>
+                            <ChevronDownIcon size={20} />
+
+                            {showDateDropdown && (
+                                <div className="absolute top-7 left-0 bg-white shadow-md rounded p-2 z-10 w-32">
+                                    <div
+                                        onClick={() => { setDateFilter("Newest"); setShowDateDropdown(false); }}
+                                        className="cursor-pointer hover:bg-gray-100 p-1"
+                                    >
+                                        Newest
+                                    </div>
+                                    <div
+                                        onClick={() => { setDateFilter("Oldest"); setShowDateDropdown(false); }}
+                                        className="cursor-pointer hover:bg-gray-100 p-1"
+                                    >
+                                        Oldest
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Category Filter */}
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="border border-gray-300 p-2 rounded font-medium bg-white cursor-pointer"
+                        >
+                            {categories.map((cat, index) => (
+                                <option key={index} value={cat}>
+                                    {cat}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Add Transaction Button */}
+                        <button
+                            onClick={() => navigate('/transactions/add')}
+                            className="bg-[#0A3594] flex p-2 font-medium text-white gap-2 rounded-sm"
+                        >
+                            <PlusIcon size={20} className="text-white" /> Transactions
+                        </button>
                     </div>
-                    <button onClick={()=>navigate('/transactions/add')} className='bg-[#0A3594] flex p-2 font-medium text-white gap-2 rounded-sm '>
-                        <PlusIcon size={20} className='text-white text-2xl font-bold' /> Transactions
-                    </button>
+
                 </div>
-                {/* <div className="mb-8">
-                    <p className="text-muted-foreground">
-                        Manage and track your financial transactions
-                    </p>
-                </div> */}
-                {
-                    transactions?.length > 0 ?
+
+                {/* No matching results */}
+                {noResults && (
+                    <div className="text-center mt-20">
+                        <p className="text-xl font-semibold mb-4 text-gray-600">
+                            No transactions found for this category or search.
+                        </p>
+                        <button
+                            onClick={resetFilters}
+                            className="px-4 py-2 bg-blue-600 text-white rounded"
+                        >
+                            Reset Filters
+                        </button>
+                    </div>
+                )}
+
+                {/* Transactions Table */}
+                {!noResults ? (
+                    <>
                         <TransactionTable
-                            transactions={transactions}
+                            transactions={filteredTransactions}
                             onDelete={handleDelete}
-                            onEdit={handleEdit}
+                            onEdit={console.log}
                         />
-                        :
-                        <CreateTransactions />
-                }
+
+                        {/* Reset Below Table */}
+                        {showResetBelow && (
+                            <div className="text-center mt-4">
+                                <button
+                                    onClick={resetFilters}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                                >
+                                    Reset Filters
+                                </button>
+                            </div>
+                        )}
+                    </>
+                ) : transactions?.length === 0 ? (
+                    <CreateTransactions />
+                ) : null}
+
             </div>
         </main>
     );
-}
-export default AllTransactions
+};
 
-
-
-
-// [
-//         {
-//             id: 1,
-//             date: '13/03/2025',
-//             description: 'Uber ride',
-//             category: 'Transport',
-//             account: 'Card',
-//             amount: -6000,
-//         },
-//         {
-//             id: 2,
-//             date: '12/04/2025',
-//             description: 'Salary',
-//             category: 'Income',
-//             account: 'Direct deposit',
-//             amount: 150000,
-//         },
-//         {
-//             id: 3,
-//             date: '04/05/2025',
-//             description: 'Starbucks Coffee',
-//             category: 'Food and Drinks',
-//             account: 'Card',
-//             amount: -3900,
-//         },
-//         {
-//             id: 4,
-//             date: '23/08/2025',
-//             description: 'Netflix Subscription',
-//             category: 'Entertainment',
-//             account: 'Card',
-//             amount: -2500,
-//         },
-//         {
-//             id: 5,
-//             date: '12/04/2025',
-//             description: 'Gym Membership',
-//             category: 'Fitness & Wellness',
-//             account: 'Bank',
-//             amount: -20000,
-//         },
-//         {
-//             id: 6,
-//             date: '11/04/2025',
-//             description: 'Electricity Bills',
-//             category: 'Utilities',
-//             account: 'Bank',
-//             amount: -7000,
-//         },
-//         {
-//             id: 7,
-//             date: '02/02/2025',
-//             description: 'Dine-in',
-//             category: 'Food & Drinks',
-//             account: 'Card',
-//             amount: -10000,
-//         },
-//         {
-//             id: 8,
-//             date: '16/10/2025',
-//             description: 'Sportify',
-//             category: 'Entertainment',
-//             account: 'Card',
-//             amount: -4000,
-//         },
-//         {
-//             id: 9,
-//             date: '17/06/2025',
-//             description: 'Medicare Clinic Consultation',
-//             category: 'Health',
-//             account: 'Cash',
-//             amount: -12000,
-//         },
-//         {
-//             id: 10,
-//             date: '26/06/2025',
-//             description: 'Bank Deposit Transfer',
-//             category: 'Income',
-//             account: 'Bank',
-//             amount: 200000,
-//         },
-//         {
-//             id: 11,
-//             date: '13/04/2025',
-//             description: 'Footwears',
-//             category: 'Shopping',
-//             account: 'Cash',
-//             amount: -15000,
-//         },
-//         {
-//             id: 12,
-//             date: '08/09/2025',
-//             description: 'Shell Gas Station',
-//             category: 'Fuel',
-//             account: 'Cash',
-//             amount: -9000,
-//         },
-//         {
-//             id: 13,
-//             date: '08/08/2025',
-//             description: 'Shein Purchase',
-//             category: 'Shopping',
-//             account: 'Card',
-//             amount: -19000,
-//         },
-//         {
-//             id: 14,
-//             date: '22/02/2025',
-//             description: 'School fees',
-//             category: 'Education',
-//             account: 'Bank',
-//             amount: -120000,
-//         },
-//         {
-//             id: 15,
-//             date: '26/04/2025',
-//             description: 'Phone data',
-//             category: 'Utilities',
-//             account: 'Bank',
-//             amount: -10000,
-//         },
-//     ]
+export default AllTransactions;

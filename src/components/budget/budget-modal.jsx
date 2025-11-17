@@ -137,7 +137,7 @@ export default function BudgetModal({
                 disabled={isLoading} // disable while loading
               >
                 <option value="">Select a category</option>
-                {categories.map((cat) => (
+                {categories.map((cat) => cat.type=='EXPENSE'&&(
                   <option key={cat.id} value={cat.id}>
                     {cat.name} ({cat.type})
                   </option>
