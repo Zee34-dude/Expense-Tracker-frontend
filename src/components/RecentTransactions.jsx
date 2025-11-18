@@ -101,10 +101,10 @@ function RecentTransactions({ transactions }) {
         <tbody>
           {filteredTransactions.map((item, index) => (
             <tr key={index} className="border-b border-gray-100">
-              <td className="py-3 text-gray-600">{item.account.type}</td>
-              <td className="py-3 text-gray-600">{item.category?.name}</td>
-              <td className="py-3 font-medium text-gray-800">{item.amount}</td>
-              <td className="py-3 font-medium text-gray-800">{formatDate(item.date)}</td>
+              <td className="text-left py-3 text-gray-600">{item.account.type}</td>
+              <td className="text-left py-3 text-gray-600">{item.category?.name}</td>
+              <td className="text-left py-3 font-medium text-gray-800">{item.amount}</td>
+              <td className="text-left py-3 font-medium text-gray-800">{formatDate(item.date)}</td>
             </tr>
           ))}
         </tbody>

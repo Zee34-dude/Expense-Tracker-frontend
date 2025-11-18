@@ -15,6 +15,7 @@ import AllTransactions from './pages/AllTransactions.jsx';
 import BudgetPage from './pages/Budget.jsx';
 import ReportPage from './pages/ReportPage.jsx';
 import HelpPage from './pages/HelpPage.jsx';
+import UserProfile from './pages/UserPage.jsx';
 
 const AppRouter = () => {
     const { user, authInitialized } = useContext(UserContext);
@@ -41,6 +42,7 @@ const AppRouter = () => {
         { path: '/budget', element: <BudgetPage />, protected: true },
         { path: '/reports', element: <ReportPage />, protected: true },
         { path: '/help', element: <HelpPage />, protected: true },
+        { path: '/user-profile', element: <UserProfile />, protected: true },
     ];
 
     return (
