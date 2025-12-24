@@ -6,6 +6,7 @@ import { UserContext } from "../context/UserContext";
 import { addDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 const LoginPage = () => {
+  const API_URL = import.meta.env.VITE_API_URL + "/users";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -29,7 +30,6 @@ const LoginPage = () => {
         setErrors({ email: "", password: "Login failed. Please try again." });
     }
   };
-const API_URL = import.meta.env.VITE_API_URL + "/users";
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -107,7 +107,7 @@ const API_URL = import.meta.env.VITE_API_URL + "/users";
       const token = await user.getIdToken();
 
       // send to backend
-      await fetch("http://localhost:5000/api/users", {
+      await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
