@@ -29,7 +29,7 @@ const LoginPage = () => {
         setErrors({ email: "", password: "Login failed. Please try again." });
     }
   };
-
+const API_URL = import.meta.env.VITE_API_URL + "/users";
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -60,7 +60,7 @@ const LoginPage = () => {
       const token = await user.getIdToken();
 
       // send to backend
-      await fetch("http://localhost:5000/api/users", {
+      await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -104,6 +104,7 @@ const SignUpPage = () => {
     }
   };
 
+  const API_URL = import.meta.env.VITE_API_URL + "/users";
   const handleGoogleLogin = async () => {
     try {
       setLoadingState(true);
@@ -117,7 +118,7 @@ const SignUpPage = () => {
       const token = await user.getIdToken();
 
       // 3️⃣ Send user data to backend (MySQL)
-      await fetch("http://localhost:5000/api/users", {
+      await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
