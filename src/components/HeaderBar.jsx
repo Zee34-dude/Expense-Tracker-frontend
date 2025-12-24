@@ -28,9 +28,7 @@ function HeaderBar({ user }) {
 
         {/* Right Section */}
         <div className="relative flex items-center gap-2 md:gap-4">
-          <FaSearch className="text-gray-400 text-lg cursor-pointer" />
-          <FaBell className="text-gray-400 text-lg cursor-pointer" />
-
+          
           {/* Profile + Dropdown */}
           <div
             className="flex items-center gap-2 md:gap-3 cursor-pointer"

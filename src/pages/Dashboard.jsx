@@ -32,6 +32,7 @@ function Dashboard() {
   const [loadingSummary, setLoadingSummary] = useState(true);
   const [previousType, setPreviousType] = useState(null);
   const [budgets, setBudgets] = useState([]);
+ 
 
   const [type, setType] = useState({
     totalIncome: 0,
@@ -146,10 +147,10 @@ function Dashboard() {
 
           {/* Middle Row - Insights and Budget/Bills */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
-            <InsightsChart data={chartData || data} />
+            <InsightsChart data={chartData} />
             <div className="space-y-4 md:space-y-6">
               <BudgetCard budgets={budgets} />
-              <BillsCard />
+        
             </div>
           </div>
 

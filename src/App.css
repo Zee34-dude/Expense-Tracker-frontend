@@ -201,5 +201,11 @@
   }
 }
 
-
+@keyframes slideIn {
+  0% { transform: translateX(120%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
 

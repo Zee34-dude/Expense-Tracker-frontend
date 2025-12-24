@@ -50,7 +50,7 @@ export default function BudgetCard({ budgets }) {
         <FaExpand className="text-gray-400 cursor-pointer" />
       </div>
 
-      <p className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
+      <p className={`${percentUsed>100?'text-red-600':'text-gray-800'} text-xl md:text-2xl font-bold  mb-2`}>
         ₦{totalSpent.toLocaleString()}
       </p>
       <p className="text-gray-600 text-sm mb-4">
@@ -60,8 +60,8 @@ export default function BudgetCard({ budgets }) {
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
         <div
-          className="bg-cyan-400 h-2 rounded-full"
-          style={{ width: `${percentUsed}%` }}
+          className={`${percentUsed<=100?'bg-cyan-400':'bg-red-600'}  h-2 rounded-full`}
+          style={{ width: `${percentUsed>100?100:percentUsed}%` }}
         />
       </div>
 

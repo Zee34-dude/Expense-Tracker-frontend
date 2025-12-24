@@ -158,7 +158,7 @@ const AllTransactions = () => {
                 </div>
 
                 {/* No matching results */}
-                {noResults && (
+                {noResults  && !transactions && (
                     <div className="text-center mt-20">
                         <p className="text-xl font-semibold mb-4 text-gray-600">
                             No transactions found for this category or search.

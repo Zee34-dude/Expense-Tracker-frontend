@@ -154,21 +154,21 @@ export default function ReportPage() {
                 <div className="px-8 py-10 bg-white shadow rounded-xl">
                     <h3 className="font-semibold">Total Income</h3>
                     <p className="text-2xl font-bold text-green-600">
-                        ${totalIncome.toLocaleString()}
+                        ₦{totalIncome.toLocaleString()}
                     </p>
                 </div>
 
                 <div className="px-8 py-10 bg-white shadow rounded-xl">
                     <h3 className="font-semibold">Total Expenses</h3>
                     <p className="text-2xl font-bold text-red-500">
-                        ${totalExpenses.toLocaleString()}
+                        ₦{totalExpenses.toLocaleString()}
                     </p>
                 </div>
 
                 <div className="px-8 py-10 bg-white shadow rounded-xl">
                     <h3 className="font-semibold">Net Balance</h3>
                     <p className="text-2xl font-bold">
-                        ${netBalance.toLocaleString()}
+                        ₦{netBalance.toLocaleString()}
                     </p>
                 </div>
             </div>
@@ -228,7 +228,7 @@ export default function ReportPage() {
                             <div className="w-full bg-gray-200 h-2 rounded">
                                 <div
                                     className="bg-blue-500 h-2 rounded"
-                                    style={{ width: `${percent}%` }}
+                                    style={{ width: `₦{percent}%` }}
                                 ></div>
                             </div>
                         </div>

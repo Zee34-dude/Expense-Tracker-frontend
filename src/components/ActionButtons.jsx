@@ -1,11 +1,13 @@
 import { FaPlus } from "react-icons/fa";
-import { useState } from "react";
+import { useState,useContext } from "react";
 import TransactionModal from "./TransactionModal";
+import { UserContext } from "../context/UserContext";
 
 
-function ActionButtons({refreshDashboard}) {
+function ActionButtons({ refreshDashboard }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
+  const { toast, setToast } = useContext(UserContext)
 
   const openModal = (type) => {
     setModalType(type);
@@ -21,6 +23,7 @@ function ActionButtons({refreshDashboard}) {
         onClose={() => setModalOpen(false)}
         type={modalType}
         onSuccess={refreshDashboard}
+        showToast={(msg) => setToast(msg)}
       />
 
       {/* Income Button */}

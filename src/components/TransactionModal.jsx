@@ -3,7 +3,7 @@ import { addTransaction } from "../apis/Transaction.api";
 import { getCategories } from "../apis/Category.api";
 import { fetchAccounts } from "../apis/Account.api";
 
-export default function TransactionModal({ isOpen, onClose, type, onSuccess }) {
+export default function TransactionModal({ isOpen, onClose, type, onSuccess, showToast }) {
     const [categories, setCategories] = useState([]);
     const [account, setAccount] = useState([]);
     const [isSending, setIsSending] = useState(false);
@@ -50,6 +50,7 @@ export default function TransactionModal({ isOpen, onClose, type, onSuccess }) {
             onSuccess();
 
             onClose(); // close modal
+            showToast(`✔ ${type} saved successfully!`);
         } catch (err) {
             console.error("Failed to save transaction:", err);
         } finally {
@@ -86,7 +87,7 @@ export default function TransactionModal({ isOpen, onClose, type, onSuccess }) {
                         className="w-full border p-2 rounded"
                     >
                         <option value="">Select Category</option>
-                        {categories?.map((cat) => (
+                        {categories?.map((cat) => cat.type == type.toUpperCase() && (
                             <option key={cat.id} value={cat.id}>
                                 {cat.name} ({cat.type})
                             </option>

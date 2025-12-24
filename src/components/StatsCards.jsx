@@ -9,7 +9,7 @@ export function StatCard({ title, amount, trendValue }) {
         <h3 className="text-gray-600 font-medium">{title}</h3>
         <FaExpand className="text-gray-400 cursor-pointer" />
       </div>
-      <p className="text-3xl font-bold text-gray-800 mb-2">${amount.toLocaleString()}</p>
+      <p className="text-3xl font-bold text-gray-800 mb-2">₦{amount.toLocaleString()}</p>
       <p
         className={`text-sm font-medium flex items-center gap-1 ${
           isPositive ? "text-green-500" : "text-red-500"

@@ -8,18 +8,22 @@ export const UserContext = createContext({
     user: null,
     setUser: () => { },
     authInitialized: false,
-    setAuthInitialized: () => { }
+    setAuthInitialized: () => { },
+    toast:null,
+    setToast:()=>{}
 
 })
 
 const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [authInitialized, setAuthInitialized] = useState(false)
+    const [toast, setToast] = useState(null);
 
     const UserContextValue = {
         user,
         setUser,
-        authInitialized, setAuthInitialized
+        authInitialized, setAuthInitialized,
+        toast,setToast
     }
 
 

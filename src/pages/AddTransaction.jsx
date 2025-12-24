@@ -82,22 +82,11 @@ const AddTransaction = () => {
               Add Transaction
             </h2>
             <p className="text-gray-500 text-1.5xl mt-1 mb-8">
-              Record a new income or expense
+              Record a new Transaction
             </p>
 
             <form onSubmit={(e) => handleSubmit(e)} className="space-y-9">
               {/* Transaction Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Transaction Type
-                </label>
-                <select name='type' defaultValue={'Enter'} className="w-full border border-gray-300 rounded-md p-2 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                  <option>Income</option>
-                  <option>Expense</option>
-                </select>
-              </div>
-
-              {/* Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Amount
